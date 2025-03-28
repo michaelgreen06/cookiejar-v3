@@ -9,7 +9,7 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 - **Frontend Framework**: Next.js (app router)
 - **Language**: TypeScript
 - **UI Library**: DaisyUI (Tailwind CSS)
-- **Blockchain Interaction**: Scaffold ETH 2 components
+- **Blockchain Interaction**: Scaffold ETH 2 components (placeholders only)
 - **Design Principle**: Mobile-first responsive design
 
 ## Core Functionality
@@ -26,9 +26,18 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 
 - 1% mandatory fee for all funds sent to a jar (handled at smart contract level, represented in UI)
 - Claim window functionality across all jars (global for whitelist control mechanism)
+  - If anyone makes a claim, everyone needs to wait until the claim window has passed to claim
+  - Tooltips should make this functionality clear
 - Support for all ERC20 tokens and ETH
 - Jars visible to all users, even if they aren't eligible to claim from them
 - Multi-chain deployment support (Optimism, Base, Gnosis, Cello, Unichain, Arbitrum)
+- Consistent naming of components (no "card" in component names unless specifically required)
+- Current version won't have integration with providers like Infura
+  - Mock data will be used only if necessary to imitate providers
+
+## Component Nesting
+
+When a page has the JarHeader component, all other components should be assumed to be nested within that component unless otherwise specified. Components containing other components should be explicitly documented.
 
 ## Pages
 
@@ -49,9 +58,9 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 - Components:
   - SearchField
   - SearchResults (with tabs)
-  - JarOverviewCard (for each result)
+  - JarOverview (for each result)
 - Navigation:
-  - Clicking on a jar card navigates to the appropriate detail page
+  - Clicking on a jar component navigates to the appropriate detail page
 
 ### Claimable Jar Detail Page
 
@@ -61,7 +70,7 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Claim functionality
   - Transaction history
 - Components:
-  - JarHeaderCard
+  - JarHeader
   - WithdrawCookies
   - ClaimHistory
 
@@ -72,12 +81,12 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Complete jar administration interface
   - Danger zone for critical actions
 - Components (in order):
-  - JarHeaderCard
+  - JarHeader
   - AddFunds
   - WithdrawalSettings
   - AccessControl
-  - ClaimHistoryCard
-  - JarOwnerCard
+  - ClaimHistory
+  - JarOwner
 - Special Features:
   - "Empty the jar" functionality in danger zone
   - Ownership transfer options
@@ -88,19 +97,20 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Requires wallet connection
   - Complete configuration options for new jar deployment
   - Single transaction deployment
+- Form Fields (only these appear as actual form fields):
+  - Initial funding amount (optional)
+  - Jar title
+  - Jar description
+  - Jar token selection (with tooltip)
 - Components:
-  - JarOwnerCard (defaults to connected wallet)
+  - JarOwner (defaults to connected wallet)
   - AccessControl (whitelist/blacklist configuration)
   - AddFunds (initial funding)
   - WithdrawalSettings (without individual save buttons)
-- Form Fields:
-  - Jar title
-  - Jar description
+- Additional Settings:
   - Claim window
   - Network selection (with tooltip)
-  - Jar token selection (with tooltip)
   - Maximum withdrawal amount
-  - Initial funding amount (optional)
 
 ## Components
 
@@ -111,7 +121,7 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Input field for EVM-compatible addresses
   - Validation for valid addresses
   - Search functionality (button and enter key)
-  - Integration with blockchain provider (e.g., Infura) to query smart contracts
+  - For MVP, we will not have integration with blockchain providers, mock data will be used if necessary
 
 ### SearchResults
 
@@ -122,11 +132,11 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
     - "Manage Jars" (jars user is owner of)
   - Default tab selection based on results
   - Empty state handling with creation CTA
-  - Each tab displays JarOverviewCard components for available jars
+  - Each tab displays JarOverview components for available jars
 
-### JarOverviewCard
+### JarOverview
 
-- **Purpose**: Provide concise overview of a jar in card format
+- **Purpose**: Provide concise overview of a jar
 - **Features**:
   - Jar title/name
   - Truncated description (expandable)
@@ -137,12 +147,12 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Truncated contract address with copy functionality
   - Clickable navigation to detail pages
 
-### JarHeaderCard
+### JarHeader
 
 - **Purpose**: Display essential jar information in all jar detail views
 - **Features**:
   - Dynamic jar title with prominent typography
-  - Expandable jar description
+  - Expandable jar description (truncated to 1 line with read more/show less)
   - Current balance with token denomination and icon
   - Network badge/icon
   - Contract address with copy and explorer link
@@ -154,24 +164,26 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
     - AddFunds
     - WithdrawalSettings
     - AccessControl
-    - ClaimHistoryCard
-    - JarOwnerCard
+    - ClaimHistory
+    - JarOwner
 
-### ClaimHistoryCard
+### ClaimHistory
 
 - **Purpose**: Display transaction history for jar claims
 - **Features**:
-  - Total claims count at top
+  - Total claims count at top of component
   - Chronological list of claims
   - Scrollable interface
   - Empty state handling
+- **Contains**:
+  - Multiple ClaimTransaction components
 - **Technical Details**:
   - Virtualized scrolling for performance
   - Address truncation
   - External blockchain explorer links
   - Timestamp formatting
 
-### ClaimTransactionCard
+### ClaimTransaction
 
 - **Purpose**: Display individual claim transaction details
 - **Features**:
@@ -188,7 +200,9 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Withdrawal availability status with visual indicators
   - Maximum withdrawal amount display
   - Amount selection (slider and direct input)
-  - Reason documentation field with validation
+  - Reason documentation field with validation:
+    - **Character count tracking (minimum 20 characters required)**
+    - Visual feedback for validation errors
   - Submit action button with conditional enabling
 - **Technical Details**:
   - Input synchronization between slider and numeric field
@@ -202,6 +216,10 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 - **Features**:
   - Amount input field with token denomination
   - Fee percentage configuration (minimum 1%)
+  - Flexible input options:
+    - Specify **total amount to be sent** (e.g., 101 tokens where 100 go to jar and 1 to fees)
+    - OR specify **amount to go to jar** (system calculates total needed)
+  - Adjustable fee amount (from 1% up to 100%)
   - Dynamic calculations showing amounts
   - Tooltips explaining token limitations
 - **Technical Details**:
@@ -224,12 +242,12 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 
 - **Purpose**: Manage access-related jar settings
 - **Contains**:
-  - UserListCard (whitelist)
-  - UserListCard (blacklist)
+  - UserList (whitelist)
+  - UserList (blacklist)
 - **Features**:
   - Tooltips explaining functionality
 
-### UserListCard
+### UserList
 
 - **Purpose**: Manage address lists for jar access
 - **Features**:
@@ -243,7 +261,7 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
   - Real-time validation
   - Smart contract integration
 
-### JarOwnerCard
+### JarOwner
 
 - **Purpose**: Display and manage jar ownership
 - **Features**:
@@ -257,18 +275,19 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 
 ## Component Relationships and Nesting
 
-- JarHeaderCard contains:
+- If a page ever has the JarHeader component, assume that all other components are nested within that component unless otherwise stated
+- JarHeader contains:
   - In claimable view: ClaimHistory, WithdrawCookies
-  - In adminable view: AddFunds, WithdrawalSettings, AccessControl, ClaimHistoryCard, JarOwnerCard
+  - In adminable view: AddFunds, WithdrawalSettings, AccessControl, ClaimHistory, JarOwner
 - AccessControl contains:
-  - UserListCard (whitelist)
-  - UserListCard (blacklist)
+  - UserList (whitelist)
+  - UserList (blacklist)
 - SearchResults contains:
-  - Multiple JarOverviewCard instances
-- ClaimHistoryCard contains:
-  - Multiple ClaimTransactionCard instances
+  - Multiple JarOverview instances
+- ClaimHistory contains:
+  - Multiple ClaimTransaction instances
 - Jar creation page contains:
-  - JarOwnerCard
+  - JarOwner
   - AccessControl
   - AddFunds
   - WithdrawalSettings (modified version without individual save buttons)
@@ -290,10 +309,15 @@ Cookie Jar v3 is a decentralized application that functions as a virtual petty c
 - Token amounts should always display appropriate denominations
 - Time displays should use appropriate units (days/hours/minutes) based on duration
 - All validation should happen in real-time with appropriate user feedback
+- Emphasize important details in UI:
+  - Claim reason must be at least 20 characters
+  - Fee adjustments range from 1% to 100%
+  - Jar can only accept the token it was created with
 
 ## Future Considerations
 
 Items that may be considered for future versions:
-- Multi-token jar support
+- Multi-token jar support (current version only supports single token per jar)
 - Link to specific block explorers
 - CSV import/export for whitelisting
+- Integration with providers like Infura

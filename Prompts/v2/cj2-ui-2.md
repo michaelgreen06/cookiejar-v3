@@ -63,6 +63,18 @@
     
     mobile 1st design
     
+    if a page ever has the jar header component assume that all other components are nested w/in that component unless otherwise stated
+
+    ensure consistent naming of components - remove card from the name unless specified otherwise. eg: jarownercard should be jarowner
+
+    the current version won't have any integration w/ providers like infura. we will exclude this functionality for now or make mock data if it's necessar to imitate providers(it's usually not necessary)
+
+    be very explicit about components that will contain other components eg claim history component contains claimtransaction component
+
+    be very clear that the addfunds component needs the ability to input how much in total will be sent to the jar (at least 1% will go to fees so only 99% will go to jar) OR how much in total will go to the jar. This is important if users care about how much in total goes into the jar vs how much in total they add. EG they want 100 tokens in the jar they would set 100 tokens to jar then it would automatically calculate they need to send ~101.01 tokens to the jar and only 100 of them would go in because the rest are going to the fees. They also need to be able to adjust the fee amount and should be able to change it form 1% all the way up to 100%
+
+    emphasize important details like the claim reason must be at least 20 characters
+    
 - we will need the following components
     - General component info
         
@@ -91,11 +103,11 @@
         
         tab 2 - Manage Jars - lists jars users are owners of
         
-        each tab in the search results component will display the jar overview card component for each available jar 
+        each tab in the search results component will display the jar overview component for each available jar 
         
         - if user only has access to claim or admin that tab will open by default
             - if they have access to both, claimable will open by default.
-    - JarOverviewCard
+    - JarOverview
         
         will display the following info 
         
@@ -105,7 +117,7 @@
         
         this is a subheading of the cj title heading
         
-        Network the jar is deployed on - network icon/badge in upper right corner of card
+        Network the jar is deployed on - network icon/badge in upper right corner of component
         
         total jar balance denominated in jar’s token
         
@@ -117,13 +129,13 @@
         
         component is clickable and will take users to the appropriate next page (claimable jar details, adminable jar details (adminable jars only take users to the admin jar details page if they are connected w/ a wallet that owns the jar)). 
         
-    - JarHeaderCard
+    - JarHeader
         
-        This is the general card that all jar specific information is displayed w/in
+        This is the general component that all jar specific information is displayed w/in
         
-        The JarHeader component displays essential information about a Cookie Jar in a card format, serving as the primary presentation layer for the jar's identity and status.
+        The JarHeader component displays essential information about a Cookie Jar in a component format, serving as the primary presentation layer for the jar's identity and status.
         
-        separate token display w/in the header isn’t necessary in the card header because it’s used as the denominator for the balance in the jarheader component & the withdrawCookies component
+        separate token display w/in the header isn’t necessary in the header because it’s used as the denominator for the balance in the jarheader component & the withdrawCookies component
         
         - it displays the following information
             - Dynamic jar title display with prominent typography
@@ -134,7 +146,7 @@
                 - Shows the token’s Icon if it is available
             - Network badge/icon to represent network jar is deployed on
             - Contract address with copy and block explorer link (clickable to open in relevant block explorer)
-                - contract address goes at the top of the card w/ the other network info
+                - contract address goes at the top of the component w/ the other network info
                 - Copy-to-clipboard functionality
                 - External block explorer link
                 - Visual feedback for copy action
@@ -152,10 +164,9 @@
             
             AccessControl
             
-            ClaimHistoryCard
+            ClaimHistory
             
-            JarOwnerCard
-            
+            JarOwner
         
         **Technical Details:**
         
@@ -164,21 +175,21 @@
         - Address formatting utilities for improved readability
         - Clipboard API integration for copying contract address
         - External linking to blockchain explorers for transaction verification
-    - ClaimHistoryCard
+    - ClaimHistory
         
         The ClaimHistory component contains a collapsable section that displays all transactions that have been made for a specific jar.
         
         - there should be a persistent total claims count at the top of the component before the scrollable transaction history
         
-        has total # of claims made at the top of the card (maybe next to the heading / title of the card?)
+        has total # of claims made at the top of the component (maybe next to the heading / title of the component?)
         
-        Shown above the scrollable section of claimtransactioncards 
+        Shown above the scrollable section of claimtransaction components 
         
         **Features:**
         
         - Claim history section showing:
         - Chronological list of all claims made against the jar
-        - each transaction is contained in a ClaimTransactionCard
+        - each transaction is contained in a ClaimTransaction component
         - Scrollable interface for viewing many transactions
         - Empty state handling when no claims exist
         
@@ -189,7 +200,8 @@
         - External linking to blockchain explorers for transaction verification
         - Timestamp formatting with relative time display
         - Scrollable claim history with overflow containment
-    - ClaimTransactionCard
+    - ClaimTransaction
+        
         - For each transaction, displays:
             - Claim amount denominated in jar’s token w/ token icon (if available)
             - Claim amount and token type
@@ -247,9 +259,9 @@
         
     - AddFunds
         
-        The AddFunds component contains a collapsable section that facilitates adding funds to the jar with options for donating additional funds to the cookiejar team on top of the mandatory 1% fee. all donations use the jar’s token
+        The AddFunds component contains a collapsable section that facilitates adding funds to the jar with options for donating additional funds to the cookiejar team on top of the mandatory 1% fee. all donations use the jar's token
         
-        - Amount input field is denominated in Jar’s token
+        - Amount input field is denominated in Jar's token
             - tooltip explicitly state that jars can only be funded in their original token
             - Displays what amount of funds go to jar and what amount of funds are collected as a fee
             - Flexible input allows the user to specify
@@ -296,14 +308,15 @@
         
         contains the following components
         
-        UserListCard (whitelisted addresses)
+        UserList (whitelisted addresses)
         
-        UserListCar (blacklisted addresses)
+        UserList (blacklisted addresses)
         
         the whitelist and blacklist variations of this component have tooltips describing their functionality
         
-    - UserListCard
-        - The UserListCard component contains a collapsable section that manages all list-related settings for a specific jar.
+    - UserList
+        
+        - The UserList component contains a collapsable section that manages all list-related settings for a specific jar.
         - it can accept props that have it serve as a blacklist or as a whitelist for accessing a jar
         - each configurable field has it’s own save changes button because each change requires an onchain transaction
             - EG if whitelist or blacklist is changed it requires the user to execute an onchain transaction
@@ -317,7 +330,7 @@
             - Real-time validation of address formats
             - list persistence across sessions
                 - data will be fetched from / submitted to the appropriate registry smart contract
-    - JarOwnerCard
+    - JarOwner
         
         This component displays the address of the jar’s current owner 
         
@@ -376,7 +389,7 @@
         
         when there are results to display the user will see them displayed in the appropriate tabs of the search results component
         
-        when a user clicks on a JarOverViewCard component it takes them to the appropriate jar details page (admin vs claim)
+        when a user clicks on a JarOverview component it takes them to the appropriate jar details page (admin vs claim)
         
     - claimable jar detail page
         
@@ -386,7 +399,7 @@
         
         if they scrolled down the page ideally they land at the same level of scroll they were at before they clicked on the jar
         
-        Expanded view shown when user clicks on a JarOverviewCard from the jar search page featuring:
+        Expanded view shown when user clicks on a JarOverview component from the jar search page featuring:
         
         This page will display all the relevant information for a selected claimable jar. 
         
@@ -410,15 +423,15 @@
         - Responsive design that works across device sizes
     - adminable jar detail pages
         
-        in order to click on any of the JarOverviewCards in the adminable tab of the SearchResults component the user needs to be connected with a wallet that is the owner of that jar. 
+        in order to click on any of the JarOverview components in the adminable tab of the SearchResults component the user needs to be connected with a wallet that is the owner of that jar. 
         
-        when they mouse over the card it should visually indicate they can’t click on the card unless they are connected with the address that is the jar owner
+        when they mouse over the component it should visually indicate they can’t click on the component unless they are connected with the address that is the jar owner
         
         Each jar can only have one owner at a time. 
         
         Jar Ownership can be transferred 
         
-        There is a button at the bottom of the page that allows the owner to “empty the jar” which would transfer all funds from the jar to their address. This is contained in a “danger zone” area similar to the danger zone area on github. the JarOwnerCard component is also in this area. clikcing the empty the jar button triggers an alert that says
+        There is a button at the bottom of the page that allows the owner to “empty the jar” which would transfer all funds from the jar to their address. This is contained in a “danger zone” area similar to the danger zone area on github. the JarOwner component is also in this area. clikcing the empty the jar button triggers an alert that says
         
         DANGER: you are about to drain this jar. Doing so will transfer all funds to your address.
         
@@ -426,7 +439,7 @@
         
         This page contains the following components (in this order):
         
-        JarHeaderCard
+        JarHeader
         
         AddFunds
         
@@ -434,9 +447,9 @@
         
         AccessControl
         
-        ClaimHistoryCard
+        ClaimHistory
         
-        JarOwnerCard
+        JarOwner
         
     - Jar creation page
         
@@ -448,18 +461,17 @@
         
         When jars are created the following information needs to be specified by the jar creator: 
         
-        Jar owner - uses JarOwnerCard component
-        
-        jar title 
-        
-        jar description. 
+        Jar owner - uses JarOwner component
+
+        The only settings that show up as form fields are:
+        - Initial funding amount (optional) 
+        - Jar title  
+        - Jar description
+        - Jar token selection (with tooltip)
+
+        All other settings are contained within the mentioned components.
         
         claim window 
-        
-        (how long users must wait between fund withdrawals. Eg if the claim window is 60 min then funds can only be withdrawn every 60 min)
-        
-        should have a tooltip describing this setting
-        
         - network selection
             
             tooltip that explains that this will always be the network for the jar and can’t be changed after the jar is created
@@ -515,7 +527,7 @@
                 
                 (won’t have buttons for each individual setting like it does on the jar admin page. 
                 
-            - JarOwnerCard
+            - JarOwner
                 
                 (needs to be an evm compatiable wallet address), 
                 
@@ -524,11 +536,4 @@
                 Will have an edit button that enables the jar creator to provide a different address for the jar owner 
                 
                 when they hit the edit button it will warn them that only the new address will be able to modify jar settings after the jar is created
-                
-            
-        
-- possible fat to cut
-    
-    link to specific block explorers
-    
-    csv import/export for whitelisting
+{{ ... }}
